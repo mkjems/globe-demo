@@ -1,5 +1,6 @@
 import './style.css'
 import * as THREE from 'three'
+import { createCameraControls } from './cameraControls'
 import { createCoordinateGrid, createLandDots } from './globeObjects'
 import { loadLandPoints } from './landPoints'
 
@@ -26,29 +27,19 @@ async function init() {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
+  const controls = createCameraControls(camera, renderer.domElement);
 
   const globeGroup = new THREE.Group();
   globeGroup.add(createCoordinateGrid(globeRadius));
   globeGroup.add(createLandDots(landPoints, globeRadius));
   scene.add(globeGroup);
 
-  let mouseX = 0;
-  let mouseY = 0;
-
-  window.addEventListener('mousemove', (event) => {
-    mouseX = (event.clientX / window.innerWidth - 0.5) * 2;
-    mouseY = (event.clientY / window.innerHeight - 0.5) * 2;
-  });
-
   function animate() {
     requestAnimationFrame(animate);
 
     globeGroup.rotation.y += 0.001;
-    globeGroup.rotation.x += 0.0003;
 
-    globeGroup.rotation.y += mouseX * 0.001;
-    globeGroup.rotation.x += mouseY * 0.001;
-
+    controls.update();
     renderer.render(scene, camera);
   }
 
@@ -59,6 +50,7 @@ async function init() {
     camera.updateProjectionMatrix();
 
     renderer.setSize(window.innerWidth, window.innerHeight);
+    controls.update();
   });
 }
 
