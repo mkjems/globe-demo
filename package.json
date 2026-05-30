@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "prepare:land": "node scripts/prepare-land-points.mjs",
+    "prepare:country-lines": "node scripts/prepare-country-lines.mjs",
+    "prepare:data": "npm run prepare:land && npm run prepare:country-lines",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"

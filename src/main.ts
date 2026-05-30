@@ -1,11 +1,13 @@
 import './style.css'
 import * as THREE from 'three'
 import { createCameraControls } from './cameraControls'
-import { createCoordinateGrid, createLandDots } from './globeObjects'
+import { loadCountryLines } from './countryLines'
+import { createCoordinateGrid, createCountryLines, createLandDots } from './globeObjects'
 import { lonLatToVector3 } from './globeMath'
 import { loadLandPoints } from './landPoints'
 
 const globeRadius = 1.6;
+const useCountryLines = true;
 const initialCameraDistance = 4;
 const denmarkView = {
   lon: 12.5683,
@@ -13,8 +15,6 @@ const denmarkView = {
 };
 
 async function init() {
-  const landPoints = await loadLandPoints();
-
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(
     65,
@@ -42,7 +42,15 @@ async function init() {
 
   const globeGroup = new THREE.Group();
   globeGroup.add(createCoordinateGrid(globeRadius));
-  globeGroup.add(createLandDots(landPoints, globeRadius));
+
+  if (useCountryLines) {
+    const countryLines = await loadCountryLines();
+    globeGroup.add(createCountryLines(countryLines, globeRadius));
+  } else {
+    const landPoints = await loadLandPoints();
+    globeGroup.add(createLandDots(landPoints, globeRadius));
+  }
+
   scene.add(globeGroup);
 
   function animate() {

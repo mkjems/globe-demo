@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import type { LonLatRing } from './countryLines'
 import { lonLatToVector3 } from './globeMath'
 import type { LonLatPoint } from './landPoints'
 
@@ -25,6 +26,25 @@ export function createLandDots(points: LonLatPoint[], radius: number) {
   });
 
   return new THREE.Points(geometry, material);
+}
+
+export function createCountryLines(rings: LonLatRing[], radius: number) {
+  const group = new THREE.Group();
+  const material = new THREE.LineBasicMaterial({
+    color: globeColor,
+    transparent: true,
+    opacity: 0.78
+  });
+
+  for (const ring of rings) {
+    const points = ring.map(([lon, lat]) => (
+      lonLatToVector3(lon, lat, radius * lineRadiusOffset)
+    ));
+
+    group.add(createLine(points, material));
+  }
+
+  return group;
 }
 
 export function createCoordinateGrid(radius: number) {
