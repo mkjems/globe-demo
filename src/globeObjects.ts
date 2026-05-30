@@ -32,7 +32,7 @@ export function createCoordinateGrid(radius: number) {
   const lineMaterial = new THREE.LineBasicMaterial({
     color: globeColor,
     transparent: true,
-    opacity: 0.24
+    opacity: 0.34
   });
 
   for (let lon = -180; lon < 180; lon += 30) {

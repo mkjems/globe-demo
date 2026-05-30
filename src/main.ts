@@ -37,7 +37,7 @@ async function init() {
   function animate() {
     requestAnimationFrame(animate);
 
-    globeGroup.rotation.y += 0.001;
+    globeGroup.rotation.y += 0.0001;
 
     controls.update();
     renderer.render(scene, camera);
