@@ -30,10 +30,10 @@ export function createLandDots(points: LonLatPoint[], radius: number) {
 
 export function createCountryLines(rings: LonLatRing[], radius: number) {
   const group = new THREE.Group();
-  const material = new THREE.LineBasicMaterial({
+  const material = createFacingFadeLineMaterial({
     color: globeColor,
-    transparent: true,
-    opacity: 0.78
+    frontOpacity: 1.0,
+    backOpacity: 0.35
   });
 
   for (const ring of rings) {
@@ -47,13 +47,19 @@ export function createCountryLines(rings: LonLatRing[], radius: number) {
   return group;
 }
 
-export function createCoordinateGrid(radius: number) {
+export function createCoordinateGrid(radius: number, useFacingFade = false) {
   const grid = new THREE.Group();
-  const lineMaterial = new THREE.LineBasicMaterial({
-    color: globeColor,
-    transparent: true,
-    opacity: 0.34
-  });
+  const lineMaterial = useFacingFade
+    ? createFacingFadeLineMaterial({
+      color: globeColor,
+      frontOpacity: 0.28,
+      backOpacity: 0.02
+    })
+    : new THREE.LineBasicMaterial({
+      color: globeColor,
+      transparent: true,
+      opacity: 0.34
+    });
 
   for (let lon = -180; lon < 180; lon += 30) {
     grid.add(createLongitudeLine(lon, radius, lineMaterial));
@@ -89,4 +95,47 @@ function createLatitudeLine(lat: number, radius: number, material: THREE.Materia
 function createLine(points: THREE.Vector3[], material: THREE.Material) {
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
   return new THREE.Line(geometry, material);
+}
+
+function createFacingFadeLineMaterial({
+  color,
+  frontOpacity,
+  backOpacity
+}: {
+  color: THREE.ColorRepresentation;
+  frontOpacity: number;
+  backOpacity: number;
+}) {
+  return new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    uniforms: {
+      lineColor: { value: new THREE.Color(color) },
+      frontOpacity: { value: frontOpacity },
+      backOpacity: { value: backOpacity }
+    },
+    vertexShader: `
+      varying float vFacing;
+
+      void main() {
+        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+        vec3 surfaceNormal = normalize(worldPosition.xyz);
+        vec3 cameraDirection = normalize(cameraPosition - worldPosition.xyz);
+
+        vFacing = smoothstep(-0.15, 0.72, dot(surfaceNormal, cameraDirection));
+        gl_Position = projectionMatrix * viewMatrix * worldPosition;
+      }
+    `,
+    fragmentShader: `
+      uniform vec3 lineColor;
+      uniform float frontOpacity;
+      uniform float backOpacity;
+      varying float vFacing;
+
+      void main() {
+        float opacity = mix(backOpacity, frontOpacity, vFacing);
+        gl_FragColor = vec4(lineColor, opacity);
+      }
+    `
+  });
 }

@@ -41,7 +41,7 @@ async function init() {
   const controls = createCameraControls(camera, renderer.domElement);
 
   const globeGroup = new THREE.Group();
-  globeGroup.add(createCoordinateGrid(globeRadius));
+  globeGroup.add(createCoordinateGrid(globeRadius, useCountryLines));
 
   if (useCountryLines) {
     const countryLines = await loadCountryLines();
@@ -56,7 +56,7 @@ async function init() {
   function animate() {
     requestAnimationFrame(animate);
 
-    globeGroup.rotation.y += 0.000;
+    globeGroup.rotation.y += 0.0001;
 
     controls.update();
     renderer.render(scene, camera);
