@@ -2,9 +2,15 @@ import './style.css'
 import * as THREE from 'three'
 import { createCameraControls } from './cameraControls'
 import { createCoordinateGrid, createLandDots } from './globeObjects'
+import { lonLatToVector3 } from './globeMath'
 import { loadLandPoints } from './landPoints'
 
 const globeRadius = 1.6;
+const initialCameraDistance = 4;
+const denmarkView = {
+  lon: 12.5683,
+  lat: 55.6761
+};
 
 async function init() {
   const landPoints = await loadLandPoints();
@@ -17,7 +23,12 @@ async function init() {
     1000
   );
 
-  camera.position.z = 4;
+  camera.position.copy(lonLatToVector3(
+    denmarkView.lon,
+    denmarkView.lat,
+    initialCameraDistance
+  ));
+  camera.lookAt(0, 0, 0);
 
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
@@ -37,7 +48,7 @@ async function init() {
   function animate() {
     requestAnimationFrame(animate);
 
-    globeGroup.rotation.y += 0.0001;
+    globeGroup.rotation.y += 0.000;
 
     controls.update();
     renderer.render(scene, camera);
