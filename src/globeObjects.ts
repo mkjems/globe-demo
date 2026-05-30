@@ -28,13 +28,23 @@ export function createLandDots(points: LonLatPoint[], radius: number) {
   return new THREE.Points(geometry, material);
 }
 
-export function createCountryLines(rings: LonLatRing[], radius: number) {
+export function createCountryLines(
+  rings: LonLatRing[],
+  radius: number,
+  useFacingFade = false
+) {
   const group = new THREE.Group();
-  const material = createFacingFadeLineMaterial({
-    color: globeColor,
-    frontOpacity: 1.0,
-    backOpacity: 0.35
-  });
+  const material = useFacingFade
+    ? createFacingFadeLineMaterial({
+      color: globeColor,
+      frontOpacity: 1.0,
+      backOpacity: 0.35
+    })
+    : new THREE.LineBasicMaterial({
+      color: globeColor,
+      transparent: true,
+      opacity: 0.78
+    });
 
   for (const ring of rings) {
     const points = ring.map(([lon, lat]) => (

@@ -8,6 +8,7 @@ import { loadLandPoints } from './landPoints'
 
 const globeRadius = 1.6;
 const useCountryLines = true;
+const useLineFadeShader = true;
 const initialCameraDistance = 4;
 const denmarkView = {
   lon: 12.5683,
@@ -41,11 +42,11 @@ async function init() {
   const controls = createCameraControls(camera, renderer.domElement);
 
   const globeGroup = new THREE.Group();
-  globeGroup.add(createCoordinateGrid(globeRadius, useCountryLines));
+  globeGroup.add(createCoordinateGrid(globeRadius, useCountryLines && useLineFadeShader));
 
   if (useCountryLines) {
     const countryLines = await loadCountryLines();
-    globeGroup.add(createCountryLines(countryLines, globeRadius));
+    globeGroup.add(createCountryLines(countryLines, globeRadius, useLineFadeShader));
   } else {
     const landPoints = await loadLandPoints();
     globeGroup.add(createLandDots(landPoints, globeRadius));
