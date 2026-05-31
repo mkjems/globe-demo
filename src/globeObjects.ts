@@ -62,13 +62,13 @@ export function createCoordinateGrid(radius: number, useFacingFade = false) {
   const lineMaterial = useFacingFade
     ? createFacingFadeLineMaterial({
       color: globeColor,
-      frontOpacity: 0.28,
-      backOpacity: 0.02
+      frontOpacity: 0.38,
+      backOpacity: 0.2
     })
     : new THREE.LineBasicMaterial({
       color: globeColor,
       transparent: true,
-      opacity: 0.34
+      opacity: 0.44
     });
 
   for (let lon = -180; lon < 180; lon += 30) {

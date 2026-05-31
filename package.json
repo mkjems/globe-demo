@@ -6,7 +6,8 @@
   "scripts": {
     "prepare:land": "node scripts/prepare-land-points.mjs",
     "prepare:country-lines": "node scripts/prepare-country-lines.mjs",
-    "prepare:data": "npm run prepare:land && npm run prepare:country-lines",
+    "prepare:natural-earth-lines": "node scripts/prepare-natural-earth-lines.mjs",
+    "prepare:data": "npm run prepare:land && npm run prepare:country-lines && npm run prepare:natural-earth-lines",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"

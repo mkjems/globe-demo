@@ -5,9 +5,18 @@ import { loadCountryLines } from './countryLines'
 import { createCoordinateGrid, createCountryLines, createLandDots } from './globeObjects'
 import { lonLatToVector3 } from './globeMath'
 import { loadLandPoints } from './landPoints'
+import { loadNaturalEarthLines } from './naturalEarthLines'
 
 const globeRadius = 1.6;
-const useCountryLines = true;
+const GlobeRenderMode = {
+  Dots: 'dots',
+  Lines: 'lines',
+  NaturalEarthLines: 'naturalEarthLines'
+} as const;
+
+type GlobeRenderMode = typeof GlobeRenderMode[keyof typeof GlobeRenderMode];
+
+const renderMode: GlobeRenderMode = GlobeRenderMode.NaturalEarthLines;
 const useLineFadeShader = true;
 const initialCameraDistance = 4;
 const denmarkView = {
@@ -41,12 +50,16 @@ async function init() {
   document.body.appendChild(renderer.domElement);
   const controls = createCameraControls(camera, renderer.domElement);
 
+  const usesLineRenderer = renderMode !== GlobeRenderMode.Dots;
   const globeGroup = new THREE.Group();
-  globeGroup.add(createCoordinateGrid(globeRadius, useCountryLines && useLineFadeShader));
+  globeGroup.add(createCoordinateGrid(globeRadius, usesLineRenderer && useLineFadeShader));
 
-  if (useCountryLines) {
+  if (renderMode === GlobeRenderMode.Lines) {
     const countryLines = await loadCountryLines();
     globeGroup.add(createCountryLines(countryLines, globeRadius, useLineFadeShader));
+  } else if (renderMode === GlobeRenderMode.NaturalEarthLines) {
+    const naturalEarthLines = await loadNaturalEarthLines();
+    globeGroup.add(createCountryLines(naturalEarthLines, globeRadius, useLineFadeShader));
   } else {
     const landPoints = await loadLandPoints();
     globeGroup.add(createLandDots(landPoints, globeRadius));
